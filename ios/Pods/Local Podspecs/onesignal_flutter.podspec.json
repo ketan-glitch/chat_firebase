@@ -1,0 +1,31 @@
+{
+  "name": "onesignal_flutter",
+  "version": "3.4.1",
+  "summary": "The OneSignal Flutter SDK",
+  "description": "Allows you to easily add OneSignal to your flutter projects, to make sending and handling push notifications easy",
+  "homepage": "https://www.onesignal.com",
+  "license": {
+    "file": "../LICENSE"
+  },
+  "authors": {
+    "Brad Hesse": "brad@onesignal.com",
+    "Josh Kasten": "josh@onesignal.com"
+  },
+  "source": {
+    "path": "."
+  },
+  "source_files": "Classes/**/*",
+  "public_header_files": "Classes/**/*.h",
+  "dependencies": {
+    "Flutter": [
+
+    ],
+    "OneSignalXCFramework": [
+      "3.11.2"
+    ]
+  },
+  "platforms": {
+    "ios": "9.0"
+  },
+  "static_framework": true
+}
