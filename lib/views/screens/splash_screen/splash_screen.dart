@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:developer';
 
+import 'package:chat_firebase/services/route_helper.dart';
+import 'package:chat_firebase/views/base/custom_image.dart';
+import 'package:chat_firebase/views/screens/auth_screens/login_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_template/views/base/custom_image.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -15,7 +18,9 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     Timer.run(() {
-      Future.delayed(const Duration(seconds: 2), () {});
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushReplacement(context, getCustomRoute(child: const LoginScreen()));
+      });
       /*if (Get.find<AuthController>().isLoggedIn()) {
         Get.find<AuthController>().getUserProfileData().then((value) {
           Future.delayed(const Duration(seconds: 2), () {
@@ -50,6 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    log('$size');
     return Scaffold(
       body: SizedBox(
         width: size.width,

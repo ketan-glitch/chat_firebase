@@ -1,6 +1,6 @@
 import 'dart:developer';
 
-import 'package:flutter_template/views/screens/splash_screen/splash_screen.dart';
+import 'package:chat_firebase/views/screens/splash_screen/splash_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 

@@ -1,7 +1,10 @@
+import 'dart:io';
+
+import 'package:chat_firebase/services/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_template/services/theme.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'services/init.dart';
 import 'views/screens/splash_screen/splash_screen.dart';
@@ -13,8 +16,7 @@ void main() async {
 }
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<ScaffoldMessengerState> snackBarKey =
-    GlobalKey<ScaffoldMessengerState>();
+final GlobalKey<ScaffoldMessengerState> snackBarKey = GlobalKey<ScaffoldMessengerState>();
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -35,28 +37,25 @@ class _MyAppState extends State<MyApp> {
       }
     });
 
-    OneSignal.shared.setNotificationWillShowInForegroundHandler(
-        (OSNotificationReceivedEvent event) {
+    OneSignal.shared.setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
       event.complete(event.notification);
     });
 
-    OneSignal.shared
-        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {});
+    OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {});
 
-    OneSignal.shared
-        .setPermissionObserver((OSPermissionStateChanges changes) {});
+    OneSignal.shared.setPermissionObserver((OSPermissionStateChanges changes) {});
 
-    OneSignal.shared
-        .setSubscriptionObserver((OSSubscriptionStateChanges changes) {});
+    OneSignal.shared.setSubscriptionObserver((OSSubscriptionStateChanges changes) {});
 
-    OneSignal.shared.setEmailSubscriptionObserver(
-        (OSEmailSubscriptionStateChanges emailChanges) {});
+    OneSignal.shared.setEmailSubscriptionObserver((OSEmailSubscriptionStateChanges emailChanges) {});
   }
 
   @override
   void initState() {
     super.initState();
-    initPlatForm();
+    if (Platform.isAndroid || Platform.isIOS) {
+      initPlatForm();
+    }
   }
 
   @override
@@ -68,12 +67,19 @@ class _MyAppState extends State<MyApp> {
           currentFocus.unfocus();
         }
       },
-      child: MaterialApp(
-        navigatorKey: navigatorKey,
-        themeMode: ThemeMode.light,
-        theme: CustomTheme.dark,
-        debugShowCheckedModeBanner: false,
-        home: const SplashScreen(),
+      child: ResponsiveSizer(
+        maxMobileWidth: 599,
+        maxTabletWidth: 1200,
+        builder: (context, orientation, screenType) {
+          return MaterialApp(
+            navigatorKey: navigatorKey,
+            title: "Chat App",
+            themeMode: ThemeMode.light,
+            theme: CustomTheme.dark,
+            debugShowCheckedModeBanner: false,
+            home: const SplashScreen(),
+          );
+        },
       ),
     );
   }

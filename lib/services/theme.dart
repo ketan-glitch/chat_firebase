@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-Color primaryColor = const Color(0xFF941f37);
-Color secondaryColor = const Color(0xFF941f37).withOpacity(.47);
+Color primaryColor = const Color(0xff244248);
+Color secondaryColor = const Color(0xff0c2d35).withOpacity(.47);
 Color backgroundDark = const Color(0xff231F20);
 Color backgroundLight = const Color(0xffffffff);
 
-const Color textPrimary = Color(0xff000000);
-const Color textSecondary = Color(0xff838383);
 Map<int, Color> color = const {
   50: Color.fromRGBO(255, 244, 149, .1),
   100: Color.fromRGBO(255, 244, 149, .2),
@@ -24,12 +22,14 @@ Map<int, Color> color = const {
 MaterialColor colorCustom = MaterialColor(0XFFFFF495, color);
 
 class CustomTheme {
+  static Color textPrimary = const Color(0xff000000);
+  static Color textSecondary = const Color(0xff838383);
   static ThemeData dark = ThemeData(
     brightness: Brightness.light,
     useMaterial3: true,
     scaffoldBackgroundColor: backgroundLight,
     hintColor: Colors.grey[200],
-    primarySwatch: colorCustom,
+    // primarySwatch: colorCustom,
     canvasColor: secondaryColor,
     primaryColorLight: secondaryColor,
     splashColor: secondaryColor,
@@ -41,23 +41,24 @@ class CustomTheme {
     errorColor: const Color(0xFFCF6679),
     primaryColorDark: Colors.black,
 
-    // iconTheme: IconThemeData(color: Colors.grey[500]),
-    // primaryIconTheme: IconThemeData(color: Colors.grey[500]),
+    iconTheme: IconThemeData(color: Colors.grey[500]),
+    primaryIconTheme: IconThemeData(color: Colors.grey[500]),
 
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.white,
-      actionsIconTheme: IconThemeData(
-        color: primaryColor,
+      actionsIconTheme: const IconThemeData(
+        color: Colors.white,
       ),
       iconTheme: IconThemeData(
         color: primaryColor,
       ),
+      titleTextStyle: GoogleFonts.montserrat(),
       systemOverlayStyle: const SystemUiOverlayStyle(
         // Status bar color
-        statusBarColor: Colors.white,
+        statusBarColor: Colors.transparent,
         // Status bar brightness (optional)
-        statusBarIconBrightness: Brightness.dark, // For Android (dark icons)
-        statusBarBrightness: Brightness.light, // For iOS (dark icons)
+        statusBarIconBrightness: Brightness.light, // For Android (dark icons)
+        statusBarBrightness: Brightness.dark, // For iOS (dark icons)
       ),
     ),
     typography: Typography.material2021(),
