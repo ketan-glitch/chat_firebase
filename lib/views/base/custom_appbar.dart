@@ -18,7 +18,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.backButtonColor,
       this.isHome = false,
       this.centerTitle = false,
-      this.backgroundColor = Colors.transparent,
+      this.backgroundColor = const Color(0xFF00736a),
       this.fontColor,
       this.bottom})
       : /*preferredSize = _PreferredAppBarSize(toolbarHeight, bottom?.preferredSize.height),*/
@@ -49,6 +49,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: backgroundColor,
       elevation: 0,
+      systemOverlayStyle: Theme.of(context).appBarTheme.systemOverlayStyle,
       centerTitle: centerTitle,
       leading: Navigator.canPop(context)
           ? Builder(builder: (context) {
@@ -57,7 +58,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   return leading!;
                 }
                 return BackButton(
-                  color: backButtonColor ?? Theme.of(context).primaryColor,
+                  color: backButtonColor ?? Colors.white,
                 );
               }
               return const SizedBox.shrink();
@@ -73,7 +74,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           if (title != null) {
             return Text(
               title!,
-              style: Theme.of(context).textTheme.headline1?.copyWith(fontSize: 18.0, color: fontColor),
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 18.0, color: fontColor, fontWeight: FontWeight.w400),
             );
           } else {
             return const SizedBox.shrink();

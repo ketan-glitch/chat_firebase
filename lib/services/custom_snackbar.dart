@@ -17,7 +17,7 @@ class ScaffoldSnackBar {
         SnackBar(
           content: Text(
             message,
-            style: Theme.of(_context).textTheme.headline2?.copyWith(
+            style: Theme.of(_context).textTheme.bodyLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),

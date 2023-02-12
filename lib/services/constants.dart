@@ -58,3 +58,24 @@ class AppConstants {
   static const String recentOrders = 'recent_orders';
   static const String isUser = 'is_user';
 }
+
+class FireStoreConstants {
+  static const pathUserCollection = "users";
+  static const pathMessageCollection = "messages";
+  static const nickname = "nickname";
+  static const aboutMe = "aboutMe";
+  static const photoUrl = "photoUrl";
+  static const id = "id";
+  static const chattingWith = "chatting_with";
+  static const idFrom = "idFrom";
+  static const idTo = "idTo";
+  static const timestamp = "timestamp";
+  static const content = "content";
+  static const type = "type";
+}
+
+class TypeMessage {
+  static const text = 0;
+  static const image = 1;
+  static const sticker = 2;
+}

@@ -1,17 +1,30 @@
+import 'dart:developer';
 import 'dart:io';
 
+import 'package:camera/camera.dart';
 import 'package:chat_firebase/services/theme.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
+import 'firebase_options.dart';
 import 'services/init.dart';
 import 'views/screens/splash_screen/splash_screen.dart';
 
+List<CameraDescription> cameras = <CameraDescription>[];
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await Init().initialize();
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    cameras = await availableCameras();
+  } on CameraException catch (e) {
+    log("${e.code} ${e.description}");
+  }
   runApp(const MyApp());
 }
 
@@ -75,7 +88,10 @@ class _MyAppState extends State<MyApp> {
             navigatorKey: navigatorKey,
             title: "Chat App",
             themeMode: ThemeMode.light,
-            theme: CustomTheme.dark,
+            // theme: CustomTheme.dark,
+            theme: ThemeData(
+              colorSchemeSeed: primaryColor,
+            ),
             debugShowCheckedModeBanner: false,
             home: const SplashScreen(),
           );

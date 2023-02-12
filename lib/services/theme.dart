@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-Color primaryColor = const Color(0xff244248);
+const Color primaryColor = Color(0xff244248);
 Color secondaryColor = const Color(0xff0c2d35).withOpacity(.47);
-Color backgroundDark = const Color(0xff231F20);
-Color backgroundLight = const Color(0xffffffff);
+const Color backgroundDark = Color(0xff231F20);
+const Color backgroundLight = Color(0xffffffff);
 
 Map<int, Color> color = const {
   50: Color.fromRGBO(255, 244, 149, .1),
@@ -49,7 +49,7 @@ class CustomTheme {
       actionsIconTheme: const IconThemeData(
         color: Colors.white,
       ),
-      iconTheme: IconThemeData(
+      iconTheme: const IconThemeData(
         color: primaryColor,
       ),
       titleTextStyle: GoogleFonts.montserrat(),
@@ -63,33 +63,26 @@ class CustomTheme {
     ),
     typography: Typography.material2021(),
     textTheme: TextTheme(
-      button: GoogleFonts.montserrat(
+      labelLarge: GoogleFonts.montserrat(
         fontWeight: FontWeight.w400,
         color: textSecondary,
         fontSize: 14.0,
       ),
-
-      // titleLarge: ,
-      // titleMedium: ,
-      // titleSmall: ,
-      subtitle1: const TextStyle(
-        // fontSize: 16.0,
+      titleMedium: const TextStyle(
         fontWeight: FontWeight.w400,
       ),
-      bodyText1: GoogleFonts.montserrat(
-        // fontSize: 14.0,
+      bodyLarge: GoogleFonts.montserrat(
         fontWeight: FontWeight.w400,
       ),
-      bodyText2: GoogleFonts.montserrat(
-        // fontSize: 12.0,
+      bodyMedium: GoogleFonts.montserrat(
         fontWeight: FontWeight.w400,
       ),
-      headline1: GoogleFonts.montserrat(),
-      headline2: GoogleFonts.montserrat(),
-      headline3: GoogleFonts.montserrat(),
-      headline4: GoogleFonts.montserrat(),
-      headline5: GoogleFonts.montserrat(),
-      headline6: GoogleFonts.montserrat(),
+      displayLarge: GoogleFonts.montserrat(),
+      displayMedium: GoogleFonts.montserrat(),
+      displaySmall: GoogleFonts.montserrat(),
+      headlineMedium: GoogleFonts.montserrat(),
+      headlineSmall: GoogleFonts.montserrat(),
+      titleLarge: GoogleFonts.montserrat(),
     ),
   );
 }

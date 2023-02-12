@@ -2,9 +2,11 @@
 class Assets {
   Assets._();
 
+  static const String imagesBgChat = 'assets/images/bg_chat.png';
   static const String imagesChat = 'assets/images/chat.png';
   static const String imagesExclaim = 'assets/images/exclaim.png';
   static const String imagesLogo = 'assets/images/logo.png';
   static const String imagesPlaceholder = 'assets/images/placeholder.jpg';
   static const String imagesShimmer = 'assets/images/shimmer.gif';
+  static const String imagesUserPlaceholder = 'assets/images/user_placeholder.png';
 }

@@ -1,14 +1,16 @@
+import 'package:flutter/material.dart';
+
 extension CapExtension on String? {
   String get inCaps => isValid ? (this!.isNotEmpty ? '${this![0].toUpperCase()}${this!.substring(1)}' : '') : '';
   String get capitalizeFirstOfEach => isValid ? (this!.replaceAll(RegExp(' +'), ' ').split(" ").map((str) => str.inCaps).join(" ")) : '';
   bool get isValid => this != null && this!.isNotEmpty;
   bool get isNotValid => this == null || this!.isEmpty;
-  bool get isEmail =>
-      RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-          .hasMatch(this!);
-  bool get isNotEmail =>
-      !(RegExp(r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-          .hasMatch(this!));
+  bool get isEmail => RegExp(
+          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+      .hasMatch(this!);
+  bool get isNotEmail => !(RegExp(
+          r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+      .hasMatch(this!));
   String get initials {
     if (isValid) {
       var list = this!.trim().split(' ');
@@ -25,6 +27,7 @@ extension CapExtension on String? {
 
   String get getIfValid => isValid ? this! : '';
   String get removeAllWhitespace => isValid ? this!.replaceAll(' ', '') : this!;
+  String get obscureText => isValid ? this!.replaceRange(1, 6, '******') : '';
 }
 
 extension DateTimeExtension on DateTime? {
@@ -51,4 +54,12 @@ extension Sum on List {
     }
     return sum.toInt();
   }
+}
+
+extension Context on BuildContext {
+  ThemeData get theme => Theme.of(this);
+  TextTheme get textTheme => Theme.of(this).textTheme;
+  Color get primaryColor => Theme.of(this).primaryColor;
+  Color get secondaryColor => Theme.of(this).colorScheme.secondary;
+  double get bottom => MediaQuery.of(this).viewInsets.bottom;
 }

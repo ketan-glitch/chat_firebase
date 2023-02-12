@@ -8,13 +8,13 @@ const Color textSecondary = Color(0xff838383);
 
 class CustomDecoration {
   static InputDecoration inputDecoration({
-    String? icon,
+    dynamic icon,
     String? prefixText,
     String? label,
     String? hint,
     TextStyle? hintStyle,
     Widget? suffix,
-    bool floating = false,
+    bool floating = true,
     Color color = Colors.transparent,
   }) {
     assert(prefixText == null || icon == null, "Strings are equal So this message is been displayed!!");
@@ -51,7 +51,9 @@ class CustomDecoration {
       prefixIcon: (icon != null || prefixText != null)
           ? Builder(
               builder: (context) {
-                if (icon != null) {
+                if (icon is Widget) {
+                  return icon;
+                } else if (icon is String) {
                   return SizedBox(
                     width: 48,
                     height: 48,
@@ -96,18 +98,18 @@ class CustomDecoration {
               style: GoogleFonts.roboto(
                 fontSize: 16,
                 fontWeight: FontWeight.w400,
-                color: textPrimary,
+                color: textSecondary,
               ),
             )
           : null,
-      hintText: hint ?? label,
+      hintText: hint,
       hintStyle: hintStyle ??
           GoogleFonts.roboto(
             fontSize: 16,
             fontWeight: FontWeight.w400,
             color: textSecondary,
           ),
-      floatingLabelBehavior: floating ? FloatingLabelBehavior.always : FloatingLabelBehavior.never,
+      floatingLabelBehavior: floating ? FloatingLabelBehavior.auto : FloatingLabelBehavior.never,
       contentPadding: const EdgeInsets.fromLTRB(20, 10, 30, 13),
     );
   }
