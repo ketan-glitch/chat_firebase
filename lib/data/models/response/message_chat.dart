@@ -4,6 +4,7 @@ import '../../../services/constants.dart';
 
 class MessageChat {
   String idFrom;
+  String? from;
   String idTo;
   String timestamp;
   String content;
@@ -11,6 +12,7 @@ class MessageChat {
 
   MessageChat({
     required this.idFrom,
+    required this.from,
     required this.idTo,
     required this.timestamp,
     required this.content,
@@ -20,6 +22,7 @@ class MessageChat {
   Map<String, dynamic> toJson() {
     return {
       FireStoreConstants.idFrom: idFrom,
+      FireStoreConstants.from: from,
       FireStoreConstants.idTo: idTo,
       FireStoreConstants.timestamp: timestamp,
       FireStoreConstants.content: content,
@@ -28,11 +31,19 @@ class MessageChat {
   }
 
   factory MessageChat.fromDocument(DocumentSnapshot doc) {
+    String? user;
+
+    if (doc.data().toString().contains(FireStoreConstants.from)) {
+      user = doc.get(FireStoreConstants.from).toString().split('/').last.replaceAll(')', '');
+      // log(user);
+    }
     String idFrom = doc.get(FireStoreConstants.idFrom);
+    String? from = user;
     String idTo = doc.get(FireStoreConstants.idTo);
     String timestamp = doc.get(FireStoreConstants.timestamp);
     String content = doc.get(FireStoreConstants.content);
     int type = doc.get(FireStoreConstants.type);
-    return MessageChat(idFrom: idFrom, idTo: idTo, timestamp: timestamp, content: content, type: type);
+    var data = MessageChat(idFrom: idFrom, idTo: idTo, timestamp: timestamp, content: content, type: type, from: from);
+    return data;
   }
 }

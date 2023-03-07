@@ -62,12 +62,15 @@ class AppConstants {
 class FireStoreConstants {
   static const pathUserCollection = "users";
   static const pathMessageCollection = "messages";
-  static const nickname = "nickname";
+  static const pathStatusCollection = "status";
+  static const nickname = "name";
+  static const phoneNumber = "phone_number";
   static const aboutMe = "aboutMe";
   static const photoUrl = "photoUrl";
   static const id = "id";
   static const chattingWith = "chatting_with";
   static const idFrom = "idFrom";
+  static const from = "from";
   static const idTo = "idTo";
   static const timestamp = "timestamp";
   static const content = "content";
@@ -77,5 +80,16 @@ class FireStoreConstants {
 class TypeMessage {
   static const text = 0;
   static const image = 1;
-  static const sticker = 2;
+  static const file = 2;
+  static const sticker = 3;
+}
+
+enum ImageUploadType {
+  profile('profile'),
+  message('message'),
+  messageFile('message_file'),
+  status('status');
+
+  const ImageUploadType(this.value);
+  final String value;
 }

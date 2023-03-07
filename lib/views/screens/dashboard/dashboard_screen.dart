@@ -1,11 +1,18 @@
+import 'dart:async';
+import 'dart:developer';
+
 import 'package:chat_firebase/services/route_helper.dart';
 import 'package:chat_firebase/views/screens/auth_screens/signup_screen.dart';
 import 'package:chat_firebase/views/screens/dashboard/camera_screen/camera_screen.dart';
+import 'package:chat_firebase/views/screens/dashboard/group_chat/select_user.dart';
 import 'package:flutter/material.dart';
+import 'package:get/instance_manager.dart';
 
+import '../../../controllers/firebase_controller.dart';
 import 'call_tab.dart';
-import 'hone_screen/home_screen.dart';
-import 'status/status_ttab.dart';
+import 'group_chat/group_chat_screen.dart';
+import 'home_screen/select_group_audience.dart';
+import 'status/status_tab.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -20,10 +27,17 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
   void initState() {
     tabController = TabController(length: 4, vsync: this, initialIndex: 1);
     super.initState();
+    Timer.run(() async {
+      tabController.addListener(() {
+        setState(() {});
+      });
+      await Get.find<FirebaseController>().getUserData();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    log("${tabController.index}");
     return DefaultTabController(
       initialIndex: 1,
       length: 4,
@@ -84,6 +98,9 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                   if (value == 'settings') {
                     Navigator.push(context, getCustomRoute(child: const ProfileScreen()));
                   }
+                  if (value == 'group') {
+                    Navigator.push(context, getCustomRoute(child: const SelectGroupAudience()));
+                  }
                 },
               ),
             ),
@@ -107,6 +124,12 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                   style: TextStyle(color: Colors.white),
                 ),
               ),
+              // Tab(
+              //   child: Text(
+              //     'GROUPS',
+              //     style: TextStyle(color: Colors.white),
+              //   ),
+              // ),
               Tab(
                 child: Text(
                   'STATUS',
@@ -127,11 +150,19 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
           controller: tabController,
           children: const [
             CameraScreen(),
-            ChatsTab(),
+            // ChatsTab(),
+            GroupChatsTab(),
             StatusTab(),
             CallTab(),
           ],
         ),
+        floatingActionButton: tabController.index == 1
+            ? FloatingActionButton(
+                onPressed: () {
+                  Navigator.push(context, getCustomRoute(child: const SelectUserScreen()));
+                },
+                child: const Icon(Icons.add))
+            : null,
       ),
     );
   }

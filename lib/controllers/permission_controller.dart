@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:chat_firebase/main.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -7,11 +8,11 @@ import 'package:permission_handler/permission_handler.dart';
 import '../views/base/dialogs/request_permission_dialog.dart';
 
 class PermissionController extends GetxController implements GetxService {
-  Future<bool> getPermission(Permission permission, BuildContext context) async {
+  Future<bool> getPermission(Permission permission, BuildContext? context) async {
     PermissionStatus? status;
     if (!(await permission.isGranted)) {
       bool result = (await showDialog(
-            context: context,
+            context: context ?? navigatorKey.currentState!.context,
             builder: (context) => RequestPermissionDialog(
               permission: permission.toString().split('.').last.toString(),
             ),

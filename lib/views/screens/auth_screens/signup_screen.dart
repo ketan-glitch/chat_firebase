@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:chat_firebase/controllers/firebase_controller.dart';
@@ -13,6 +14,9 @@ import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 import 'package:get/state_manager.dart';
 
+import '../../../services/constants.dart';
+import '../../base/image_picker_sheet.dart';
+
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
 
@@ -21,6 +25,14 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Timer.run(() async {
+      await Get.find<FirebaseController>().getUserData();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -51,9 +63,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     CircleAvatar(
                       radius: size.width * .2,
                       backgroundColor: Colors.white,
-                      child: const CustomAssetImage(
-                        path: Assets.imagesUserPlaceholder,
-                      ),
+                      child: Builder(builder: (context) {
+                        if (firebaseController.userData.profilePhoto.isValid) {
+                          return CustomImage(path: firebaseController.userData.profilePhoto!);
+                        }
+                        return const CustomAssetImage(
+                          path: Assets.imagesUserPlaceholder,
+                        );
+                      }),
                     ),
                     Positioned(
                       bottom: 0,
@@ -61,7 +78,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: MaterialButton(
                         minWidth: 50,
                         padding: EdgeInsets.zero,
-                        onPressed: () {},
+                        onPressed: () async {
+                          var file = await getImageBottomSheet(context);
+                          if (file != null) {
+                            firebaseController.avatarImageFile = file;
+                            firebaseController.uploadFile(ImageUploadType.profile);
+                          }
+                        },
                         color: context.secondaryColor,
                         shape: const CircleBorder(),
                         child: const Padding(

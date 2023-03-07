@@ -9,12 +9,19 @@ class DateFormatters {
   DateFormat hMA = DateFormat('hh:mm a');
   DateFormat hMs = DateFormat('hh:mm:ss');
   DateFormat dMy = DateFormat('dd MMM yyyy');
+  // ignore: non_constant_identifier_names
+  DateFormat My = DateFormat('MMMM yyyy');
+  DateFormat dM2 = DateFormat('dd MMM');
   DateFormat dMyDash = DateFormat('dd-MM-yyyy');
-  DateFormat dMonthYear = DateFormat('dd MMMMM yyyy');
+  DateFormat dMonthYear = DateFormat('dd MMMM yyyy');
   DateFormat dateTime = DateFormat('dd MMM yyyy, hh:mm a');
-  DateFormat dayDate = DateFormat('EEE,  dd MMM yyyy');
+  DateFormat ddMMTime = DateFormat('dd MMM, hh:mm a');
+  DateFormat dayDMY = DateFormat('EEE,  dd MMM yyyy');
   DateFormat dayDateTime = DateFormat('EEE,  dd MMM yyyy, hh:mm a');
   DateFormat day = DateFormat('EEE');
+  DateFormat dayDate = DateFormat('EEE, dd');
+  DateFormat dayDateMonth = DateFormat('EEE, dd MMM');
+  DateFormat dateDay = DateFormat('dd, EEEE');
   DateFormat month = DateFormat('MMMM');
   DateFormat date = DateFormat('dd');
   // DateFormat week = DateFormat('dd');

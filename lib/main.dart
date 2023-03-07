@@ -91,6 +91,9 @@ class _MyAppState extends State<MyApp> {
             // theme: CustomTheme.dark,
             theme: ThemeData(
               colorSchemeSeed: primaryColor,
+              floatingActionButtonTheme: const FloatingActionButtonThemeData(
+                backgroundColor: primaryColor,
+              ),
             ),
             debugShowCheckedModeBanner: false,
             home: const SplashScreen(),

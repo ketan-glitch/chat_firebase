@@ -18,8 +18,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       this.backButtonColor,
       this.isHome = false,
       this.centerTitle = false,
-      this.backgroundColor = const Color(0xFF00736a),
-      this.fontColor,
+      this.backgroundColor = const Color(0xff025c4c),
+      this.fontColor = Colors.white,
       this.bottom})
       : /*preferredSize = _PreferredAppBarSize(toolbarHeight, bottom?.preferredSize.height),*/
         super(key: key);
