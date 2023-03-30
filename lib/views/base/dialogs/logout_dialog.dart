@@ -67,7 +67,7 @@ class LogoutDialog extends StatelessWidget {
                   onTap: () {
                     // Get.find<AuthController>().clearSharedData();
 
-                    Navigator.pop(context);
+                    Navigator.pop(context, true);
                     // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const SplashScreen()), (route) => false);
                   },
                 )

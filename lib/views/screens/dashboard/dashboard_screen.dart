@@ -9,6 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:get/instance_manager.dart';
 
 import '../../../controllers/firebase_controller.dart';
+import '../../../services/enums/dialog_transition.dart';
+import '../../../services/get_animated_dialog.dart';
+import '../../base/dialogs/logout_dialog.dart';
+import '../splash_screen/splash_screen.dart';
 import 'call_tab.dart';
 import 'group_chat/group_chat_screen.dart';
 import 'home_screen/select_group_audience.dart';
@@ -49,11 +53,11 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
           ),
           actions: [
             // Widget for the search button
-            IconButton(
-              icon: const Icon(Icons.search),
-              color: Colors.white,
-              onPressed: () {},
-            ),
+            // IconButton(
+            //   icon: const Icon(Icons.search),
+            //   color: Colors.white,
+            //   onPressed: () {},
+            // ),
             // Widget for implementing the three-dot menu
             Theme(
               data: Theme.of(context).copyWith(useMaterial3: false),
@@ -72,18 +76,18 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                       value: 'group',
                       child: Text('New Group'),
                     ),
-                    const PopupMenuItem(
-                      value: 'broadcast',
-                      child: Text('New Broadcast'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'devices',
-                      child: Text('Linked Devices'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'starred_messages',
-                      child: Text('Starred Messages'),
-                    ),
+                    // const PopupMenuItem(
+                    //   value: 'broadcast',
+                    //   child: Text('New Broadcast'),
+                    // ),
+                    // const PopupMenuItem(
+                    //   value: 'devices',
+                    //   child: Text('Linked Devices'),
+                    // ),
+                    // const PopupMenuItem(
+                    //   value: 'starred_messages',
+                    //   child: Text('Starred Messages'),
+                    // ),
                     const PopupMenuItem(
                       value: 'settings',
                       child: Text('Settings'),
@@ -100,6 +104,14 @@ class _DashboardState extends State<Dashboard> with SingleTickerProviderStateMix
                   }
                   if (value == 'group') {
                     Navigator.push(context, getCustomRoute(child: const SelectGroupAudience()));
+                  }
+                  if (value == 'logout') {
+                    ShowDialog().getAnimatedDialog(context: context, child: const LogoutDialog(), transitionType: DialogTransition.center).then((value) {
+                      if (value ?? false) {
+                        Get.find<FirebaseController>().firebaseAuth.signOut();
+                        Navigator.pushAndRemoveUntil(context, getCustomRoute(child: const SplashScreen()), (route) => false);
+                      }
+                    });
                   }
                 },
               ),

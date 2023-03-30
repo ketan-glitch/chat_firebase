@@ -50,9 +50,15 @@ class _ImageGalleryState extends State<ImageGallery> {
               itemCount: widget.repeat ? null : widget.images.length,
               physics: widget.images.length > 1 ? const AlwaysScrollableScrollPhysics() : const NeverScrollableScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
+                String url = widget.images[index % widget.images.length];
+                if (url.startsWith('http') || url.startsWith('https') || url.startsWith('www')) {
+                } else {
+                  url = AppConstants.baseUrl + url;
+                }
+                // log(url, name: 'url');
                 return InteractiveViewer(
                   child: CustomImage(
-                    path: "${AppConstants.baseUrl}${widget.images[index % widget.images.length]}",
+                    path: url,
                   ),
                 );
               },

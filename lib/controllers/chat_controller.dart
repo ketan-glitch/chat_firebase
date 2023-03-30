@@ -159,4 +159,10 @@ class ChatController extends GetxController implements GetxService {
       );
     });
   }
+
+  Future<void> deleteMessage(reference) async {
+    await FirebaseFirestore.instance.runTransaction((Transaction myTransaction) async {
+      myTransaction.delete(reference);
+    });
+  }
 }

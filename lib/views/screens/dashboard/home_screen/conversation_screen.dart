@@ -4,11 +4,14 @@ import 'dart:io';
 
 // import 'package:chat_bubbles/bubbles/bubble_special_one.dart';
 import 'package:chat_firebase/controllers/firebase_controller.dart';
+import 'package:chat_firebase/services/enums/dialog_transition.dart';
 import 'package:chat_firebase/services/extensions.dart';
+import 'package:chat_firebase/services/get_animated_dialog.dart';
 import 'package:chat_firebase/views/screens/auth_screens/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/instance_manager.dart';
 import 'package:get/state_manager.dart';
@@ -118,9 +121,37 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           children: <Widget>[
             Builder(builder: (context) {
               if (widget.peers.length > 1) {
-                return GroupProfilePictureWidget(
-                  images: widget.peers.map((e) => e.profilePhoto.toString()).toList(),
+                return Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      chatName.getIfValid.inCaps.initials,
+                      style: const TextStyle(
+                        fontSize: 12.0,
+                        color: Colors.black,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
                 );
+                //   var images = <String>[];
+                //   for (var element in peers) {
+                //     if (element.profilePhoto.isValid) {
+                //       images.add(element.profilePhoto!);
+                //     }
+                //   }
+                //   return GroupProfilePictureWidget(
+                //     images: images,
+                //   );
+
+                // return GroupProfilePictureWidget(
+                //   images: widget.peers.map((e) => e.profilePhoto.toString()).toList(),
+                // );
               } else if (chatImage.isValid) {
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(45),
@@ -208,12 +239,14 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                                 padding: const EdgeInsets.only(top: 10, bottom: 70),
                                 // physics: const NeverScrollableScrollPhysics(),
                                 itemBuilder: (context, index) {
+                                  log('${snapshot.data!.docs[index].reference}');
                                   MessageChat messageChat = MessageChat.fromDocument(snapshot.data!.docs[index]);
 
                                   bool isSender = messageChat.idFrom == chatController.currentUserId;
                                   return ChatWidgetWithShadow(
                                     messageChat: messageChat,
                                     isSender: isSender,
+                                    reference: snapshot.data!.docs[index].reference,
                                   );
                                 },
                               );
@@ -320,9 +353,10 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
 }
 
 class ChatWidgetWithShadow extends StatefulWidget {
-  const ChatWidgetWithShadow({Key? key, required this.messageChat, required this.isSender}) : super(key: key);
+  const ChatWidgetWithShadow({Key? key, required this.messageChat, required this.isSender, required this.reference}) : super(key: key);
   final MessageChat messageChat;
   final bool isSender;
+  final DocumentReference reference;
 
   @override
   State<ChatWidgetWithShadow> createState() => _ChatWidgetWithShadowState();
@@ -414,187 +448,213 @@ class _ChatWidgetWithShadowState extends State<ChatWidgetWithShadow> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return GetShadowWidget(
-      isSender: widget.isSender,
-      child: BubbleSpecialOne(
-        isSender: widget.isSender,
-        color: widget.isSender ? const Color(0xFFdcf8c7) : Colors.white,
-        textStyle: GoogleFonts.montserrat(
-          fontSize: 14,
-          // color: Colors.white,
-        ),
-        padding: const EdgeInsets.only(left: 8, right: 14, top: 3, bottom: 3),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (sender != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  sender!.name.getIfValid,
-                  style: GoogleFonts.montserrat(
-                    fontSize: 12.0,
-                    color: Colors.purple,
-                    fontWeight: FontWeight.w600,
-                  ),
+    return GestureDetector(
+      onLongPress: () {
+        if (widget.isSender) {
+          HapticFeedback.heavyImpact();
+
+          ShowDialog().getAnimatedDialog(
+              context: context,
+              child: Dialog(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      title: Text('Delete'),
+                      onTap: () async {
+                        Get.find<ChatController>().deleteMessage(widget.reference).then((value) {
+                          Navigator.pop(context);
+                        });
+                      },
+                    ),
+                  ],
                 ),
               ),
-            if (widget.messageChat.type == TypeMessage.image)
-              CustomImage(
-                path: widget.messageChat.content,
-                fit: BoxFit.cover,
-                height: size.height * .2,
-                width: size.width,
-              ),
-            if (widget.messageChat.type == TypeMessage.file)
-              GestureDetector(
-                onTap: () async {
-                  if (downloaded) {
-                    await OpenFile.open('/storage/emulated/0/Download/${widget.messageChat.content.split('?alt').first.fileName}');
-                  } else if (downloading) {
-                    cancelToken.cancel('User Canceled Download');
-                    downloading = false;
-                    setState(() {});
-                  } else {
-                    downloading = true;
-                    setState(() {});
-                    await download();
-                    await checkFileExists();
-                    downloading = false;
-                    if (mounted) setState(() {});
-                  }
-                },
-                child: Container(
-                  width: double.infinity,
-                  // height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.black12,
-                    borderRadius: BorderRadius.circular(6.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
-                    child: Row(
-                      children: [
-                        SizedBox(
-                          width: 30,
-                          height: 30,
-                          child: Stack(
-                            children: [
-                              const Center(
-                                child: CustomAssetImage(
-                                  path: Assets.imagesFile,
-                                  width: 30,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 30,
-                                child: Center(
-                                  child: Text(
-                                    widget.messageChat.content.extension,
-                                    style: const TextStyle(fontSize: 10),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            widget.messageChat.content.split('?alt').first.fileName,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.montserrat(
-                              fontSize: 14.0,
-                            ),
-                          ),
-                        ),
-                        if (!downloaded)
-                          MaterialButton(
-                            minWidth: 50,
-                            elevation: 0,
-                            shape: const CircleBorder(),
-                            color: Colors.grey.shade200,
-                            padding: EdgeInsets.zero,
-                            onPressed: () async {
-                              if (downloaded) {
-                                await OpenFile.open('/storage/emulated/0/Download/${widget.messageChat.content.split('?alt').first.fileName}');
-                              } else if (downloading) {
-                                cancelToken.cancel('User Canceled Download');
-                                downloading = false;
-                                setState(() {});
-                              } else {
-                                downloading = true;
-                                setState(() {});
-                                await download();
-                                await checkFileExists();
-                                downloading = false;
-                                if (mounted) setState(() {});
-                              }
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Builder(builder: (context) {
-                                /*if (downloaded) {
-            return Icon(
-                Icons.open_in_new_rounded,
-                color: Colors.grey.shade700,
-            );
-          } else */
-                                if (downloading) {
-                                  return Stack(
-                                    children: [
-                                      Center(
-                                        child: CircularProgressIndicator(
-                                          value: downloadProgress,
-                                          strokeWidth: 2,
-                                        ),
-                                      ),
-                                      Positioned(
-                                        top: 0,
-                                        bottom: 0,
-                                        left: 0,
-                                        right: 0,
-                                        child: Icon(
-                                          Icons.clear,
-                                          color: Colors.grey.shade700,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                } else {
-                                  return Icon(
-                                    Icons.download,
-                                    color: Colors.grey.shade700,
-                                  );
-                                }
-                              }),
-                            ),
-                          ),
-                      ],
+              transitionType: DialogTransition.center);
+        }
+      },
+      child: GetShadowWidget(
+        isSender: widget.isSender,
+        child: BubbleSpecialOne(
+          isSender: widget.isSender,
+          color: widget.isSender ? const Color(0xFFdcf8c7) : Colors.white,
+          textStyle: GoogleFonts.montserrat(
+            fontSize: 14,
+            // color: Colors.white,
+          ),
+          padding: const EdgeInsets.only(left: 8, right: 14, top: 3, bottom: 3),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (sender != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    sender!.name.getIfValid,
+                    style: GoogleFonts.montserrat(
+                      fontSize: 12.0,
+                      color: Colors.purple,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
-              ),
-            if (widget.messageChat.type == TypeMessage.image || widget.messageChat.type == TypeMessage.file) const SizedBox(height: 10),
-            if (widget.messageChat.type == TypeMessage.text)
-              Text(
-                widget.messageChat.content,
-                style: GoogleFonts.montserrat(
-                  fontSize: 14.0,
+              if (widget.messageChat.type == TypeMessage.image)
+                CustomImage(
+                  path: widget.messageChat.content,
+                  fit: BoxFit.cover,
+                  height: size.height * .2,
+                  width: size.width,
+                ),
+              if (widget.messageChat.type == TypeMessage.file)
+                GestureDetector(
+                  onTap: () async {
+                    if (downloaded) {
+                      await OpenFile.open('/storage/emulated/0/Download/${widget.messageChat.content.split('?alt').first.fileName}');
+                    } else if (downloading) {
+                      cancelToken.cancel('User Canceled Download');
+                      downloading = false;
+                      setState(() {});
+                    } else {
+                      downloading = true;
+                      setState(() {});
+                      await download();
+                      await checkFileExists();
+                      downloading = false;
+                      if (mounted) setState(() {});
+                    }
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    // height: 100,
+                    decoration: BoxDecoration(
+                      color: Colors.black12,
+                      borderRadius: BorderRadius.circular(6.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 30,
+                            height: 30,
+                            child: Stack(
+                              children: [
+                                const Center(
+                                  child: CustomAssetImage(
+                                    path: Assets.imagesFile,
+                                    width: 30,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 30,
+                                  child: Center(
+                                    child: Text(
+                                      widget.messageChat.content.extension,
+                                      style: const TextStyle(fontSize: 10),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              widget.messageChat.content.split('?alt').first.fileName,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.montserrat(
+                                fontSize: 14.0,
+                              ),
+                            ),
+                          ),
+                          if (!downloaded)
+                            MaterialButton(
+                              minWidth: 50,
+                              elevation: 0,
+                              shape: const CircleBorder(),
+                              color: Colors.grey.shade200,
+                              padding: EdgeInsets.zero,
+                              onPressed: () async {
+                                if (downloaded) {
+                                  await OpenFile.open('/storage/emulated/0/Download/${widget.messageChat.content.split('?alt').first.fileName}');
+                                } else if (downloading) {
+                                  cancelToken.cancel('User Canceled Download');
+                                  downloading = false;
+                                  setState(() {});
+                                } else {
+                                  downloading = true;
+                                  setState(() {});
+                                  await download();
+                                  await checkFileExists();
+                                  downloading = false;
+                                  if (mounted) setState(() {});
+                                }
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Builder(builder: (context) {
+                                  /*if (downloaded) {
+              return Icon(
+                  Icons.open_in_new_rounded,
+                  color: Colors.grey.shade700,
+              );
+            } else */
+                                  if (downloading) {
+                                    return Stack(
+                                      children: [
+                                        Center(
+                                          child: CircularProgressIndicator(
+                                            value: downloadProgress,
+                                            strokeWidth: 2,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 0,
+                                          bottom: 0,
+                                          left: 0,
+                                          right: 0,
+                                          child: Icon(
+                                            Icons.clear,
+                                            color: Colors.grey.shade700,
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  } else {
+                                    return Icon(
+                                      Icons.download,
+                                      color: Colors.grey.shade700,
+                                    );
+                                  }
+                                }),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              if (widget.messageChat.type == TypeMessage.image || widget.messageChat.type == TypeMessage.file) const SizedBox(height: 10),
+              if (widget.messageChat.type == TypeMessage.text)
+                Text(
+                  widget.messageChat.content,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 14.0,
+                  ),
+                ),
+              if (widget.messageChat.type == TypeMessage.image || widget.messageChat.type == TypeMessage.file) const SizedBox(height: 5),
+              IntrinsicWidth(
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: Text(
+                    DateTime.fromMillisecondsSinceEpoch(int.parse(widget.messageChat.timestamp)).dddMMTime,
+                    style: GoogleFonts.montserrat(fontSize: 11.0, fontWeight: FontWeight.w300),
+                  ),
                 ),
               ),
-            if (widget.messageChat.type == TypeMessage.image || widget.messageChat.type == TypeMessage.file) const SizedBox(height: 5),
-            IntrinsicWidth(
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: Text(
-                  DateTime.fromMillisecondsSinceEpoch(int.parse(widget.messageChat.timestamp)).dddMMTime,
-                  style: GoogleFonts.montserrat(fontSize: 11.0, fontWeight: FontWeight.w300),
-                ),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -798,8 +858,11 @@ class GroupProfilePictureWidget extends StatelessWidget {
             ),
           );
         } else {
-          var top = [images.first, images[1]];
-          var bottom = [Get.find<FirebaseController>().userData.profilePhoto!];
+          var top = [images.first];
+          if (images.length > 1) {
+            top.add(images[1]);
+          }
+          var bottom = [Get.find<FirebaseController>().userData.profilePhoto];
           return SizedBox(
             height: 50,
             width: 50,
@@ -812,8 +875,8 @@ class GroupProfilePictureWidget extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    ...bottom.map((e) => Expanded(child: CustomImage(path: e, fit: BoxFit.cover, height: 25))).toList(),
-                    Text('+ ${images.length - 3}'),
+                    ...bottom.map((e) => Expanded(child: CustomImage(path: e.toString(), fit: BoxFit.cover, height: 25))).toList(),
+                    if (images.length > 3) Text('+ ${images.length - 3}'),
                   ],
                 ),
               ],

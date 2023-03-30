@@ -51,9 +51,9 @@ class CustomImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // log('${image.replaceAll('\\', '/')}',name: "IMAGE");
+    // log('${path.replaceAll('\\', '/')}', name: "IMAGE");
     String p = path.replaceAll('\\', '/');
-    // log(p,name: "IMAGE");
+    // log(p, name: "IMAGE");
     return CachedNetworkImage(
       imageUrl: p,
       height: height,

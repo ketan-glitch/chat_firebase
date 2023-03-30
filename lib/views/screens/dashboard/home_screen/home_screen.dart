@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat_firebase/controllers/firebase_controller.dart';
 import 'package:chat_firebase/data/models/response/user_model.dart';
 import 'package:chat_firebase/services/extensions.dart';
@@ -32,12 +34,14 @@ class _ChatsTabState extends State<ChatsTab> {
 
   @override
   Widget build(BuildContext context) {
+    log('Adasdsa');
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: StreamBuilder<QuerySnapshot>(
             stream: Get.find<FirebaseController>().getStreamFireStore(FireStoreConstants.pathUserCollection, _limit),
             builder: (context, snapshot) {
+              log('Adasdsa');
               if (!snapshot.hasData) {
                 return const Center(
                   child: CircularProgressIndicator(),
@@ -81,24 +85,34 @@ class SingleChatWidget extends StatelessWidget {
       },
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.all(Radius.circular(45)),
-            child: Builder(builder: (context) {
-              if (imageUrl.isValid) {
-                return CustomImage(
-                  path: imageUrl!,
+          GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return CustomImage(path: imageUrl!);
+                },
+              );
+            },
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(45)),
+              child: Builder(builder: (context) {
+                if (imageUrl.isValid) {
+                  return CustomImage(
+                    path: imageUrl!,
+                    height: 50,
+                    width: 50,
+                    fit: BoxFit.cover,
+                  );
+                }
+                return const CustomAssetImage(
+                  path: Assets.imagesUserPlaceholder,
                   height: 50,
                   width: 50,
                   fit: BoxFit.cover,
                 );
-              }
-              return const CustomAssetImage(
-                path: Assets.imagesUserPlaceholder,
-                height: 50,
-                width: 50,
-                fit: BoxFit.cover,
-              );
-            }),
+              }),
+            ),
           ),
           Expanded(
             child: ListTile(

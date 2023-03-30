@@ -3,13 +3,17 @@ import 'dart:developer';
 import 'package:chat_firebase/controllers/firebase_controller.dart';
 import 'package:chat_firebase/data/models/response/user_model.dart';
 import 'package:chat_firebase/services/extensions.dart';
+import 'package:chat_firebase/services/get_animated_dialog.dart';
+import 'package:chat_firebase/services/route_helper.dart';
 import 'package:chat_firebase/views/base/custom_image.dart';
+import 'package:chat_firebase/views/base/image_gallery.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get/instance_manager.dart';
+import 'package:get/get.dart';
 
 import '../../../../controllers/chat_controller.dart';
 import '../../../../services/constants.dart';
+import '../../../../services/enums/dialog_transition.dart';
 import '../home_screen/conversation_screen.dart';
 
 class GroupChatsTab extends StatefulWidget {
@@ -104,7 +108,8 @@ class SingleChatWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    log('${groupData}');
+    Size size = MediaQuery.of(context).size;
+    // log('${groupData}');
     String? chatMessage;
     String? chatTitle;
     String? imageUrl;
@@ -119,80 +124,138 @@ class SingleChatWidget extends StatelessWidget {
     }
 
     Color? seenStatusColor = Colors.blue;
-    log('$updatedAt');
+    // log('$updatedAt');
     return GestureDetector(
       onTap: () {
+        log('HRER');
         if (groupData['chat_type'] == 'group') {
           Get.find<ChatController>().groupChatId = groupData['group_id'];
         }
         Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDetailPage(peers: peers, groupName: groupData['group_name'])));
       },
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: const BorderRadius.all(Radius.circular(45)),
-            child: Builder(builder: (context) {
-              if (groupData['chat_type'] == 'group') {
-                var images = <String>[];
-                peers.forEach((element) {
-                  if (element.profilePhoto.isValid) {
-                    images.add(element.profilePhoto!);
+      child: Container(
+        color: Colors.transparent,
+        child: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                if (groupData['chat_type'] != 'group') {
+                  ShowDialog().getAnimatedDialog(
+                    context: context,
+                    child: Dialog(
+                      child: GestureDetector(
+                        onTap: () {
+                          if (imageUrl.isValid) {
+                            Navigator.push(context, getCustomRoute(child: ImageGallery(images: [imageUrl!])));
+                          }
+                        },
+                        child: CustomImage(
+                          height: size.width * .8,
+                          width: size.width * .8,
+                          path: imageUrl!,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    transitionType: DialogTransition.center,
+                  );
+                }
+                // showDialog(
+                //   context: context,
+                //   builder: (context) {
+                //     return Dialog(
+                //       child: CustomImage(
+                //         height: size.width * .8,
+                //         width: size.width * .8,
+                //         path: imageUrl!,
+                //         fit: BoxFit.cover,
+                //       ),
+                //     );
+                //   },
+                // );
+              },
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(45)),
+                child: Builder(builder: (context) {
+                  if (groupData['chat_type'] == 'group') {
+                    return Container(
+                      height: 50,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                      ),
+                      child: Center(
+                        child: Text(
+                          chatTitle.getIfValid.capitalize.initials,
+                          style: const TextStyle(
+                            fontSize: 12.0,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                    //   var images = <String>[];
+                    //   for (var element in peers) {
+                    //     if (element.profilePhoto.isValid) {
+                    //       images.add(element.profilePhoto!);
+                    //     }
+                    //   }
+                    //   return GroupProfilePictureWidget(
+                    //     images: images,
+                    //   );
                   }
-                });
-                return GroupProfilePictureWidget(
-                  images: images,
-                );
-              }
-              if (imageUrl.isValid) {
-                return CustomImage(
-                  path: imageUrl!,
-                  height: 50,
-                  width: 50,
-                  fit: BoxFit.cover,
-                );
-              }
-              return const CustomAssetImage(
-                path: Assets.imagesUserPlaceholder,
-                height: 50,
-                width: 50,
-                fit: BoxFit.cover,
-              );
-            }),
-          ),
-          Expanded(
-            child: ListTile(
-              title: Text(
-                chatTitle.getIfValid,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              subtitle: Row(children: [
-                Icon(
-                  seenStatusColor == Colors.blue ? Icons.done_all : Icons.done,
-                  size: 15,
-                  color: seenStatusColor,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 6.0),
-                    child: Text(
-                      chatMessage.getIfValid,
-                      style: const TextStyle(overflow: TextOverflow.ellipsis),
-                    ),
-                  ),
-                ),
-              ]),
-              trailing: Column(
-                children: [
-                  if (updatedAt != null)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(DateTime.fromMillisecondsSinceEpoch(updatedAt).getTimeIfTodayV2),
-                    ),
-                ],
+                  if (imageUrl.isValid) {
+                    return CustomImage(
+                      path: imageUrl!,
+                      height: 50,
+                      width: 50,
+                      fit: BoxFit.cover,
+                    );
+                  }
+                  return const CustomAssetImage(
+                    path: Assets.imagesUserPlaceholder,
+                    height: 50,
+                    width: 50,
+                    fit: BoxFit.cover,
+                  );
+                }),
               ),
             ),
-          ),
-        ],
+            Expanded(
+              child: ListTile(
+                title: Text(
+                  chatTitle.getIfValid,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: Row(children: [
+                  Icon(
+                    seenStatusColor == Colors.blue ? Icons.done_all : Icons.done,
+                    size: 15,
+                    color: seenStatusColor,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 6.0),
+                      child: Text(
+                        chatMessage.getIfValid,
+                        style: const TextStyle(overflow: TextOverflow.ellipsis),
+                      ),
+                    ),
+                  ),
+                ]),
+                trailing: Column(
+                  children: [
+                    if (updatedAt != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(DateTime.fromMillisecondsSinceEpoch(updatedAt).getTimeIfTodayV2),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

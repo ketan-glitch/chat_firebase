@@ -17,7 +17,8 @@ extension CapExtension on String? {
     if (isValid) {
       var list = this!.trim().split(' ');
       if (list.length > 1) {
-        return (list.first.isValid ? list.first[0] : '') + (list.last.isValid ? list.last[0] : '');
+        // log('${list}', name: 'LLLLLLLLLLLLLLLLL');
+        return (list.first.isValid ? list.first[0] : '') + (list[1].isValid ? list[1][0] : '');
       } else {
         return this![0];
       }

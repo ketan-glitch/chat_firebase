@@ -16,9 +16,14 @@ import 'package:responsive_sizer/responsive_sizer.dart';
 
 import 'opt_verification_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   login(FirebaseController firebaseController, context) {
     if (firebaseController.numberController.text.length > 9) {
       Navigator.pushReplacement(context, getCustomRoute(child: const OtpVerificationScreen()));
@@ -38,63 +43,64 @@ class LoginScreen extends StatelessWidget {
   }
 
   @override
+  void initState() {
+    super.initState();
+    getPhoneNumber(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     // log('$size');
-    return FutureBuilder(
-      future: getPhoneNumber(context),
-      builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-        return Scaffold(
-          body: Builder(builder: (context) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0),
-              child: Column(
-                children: [
-                  const Spacer(),
-                  const LoginImage(),
-                  // const Spacer(),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: Text(
-                      "Chat App Login",
-                      style: Theme.of(context).textTheme.headline4!.copyWith(color: CustomTheme.textSecondary, fontSize: 20.sp),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Spacer(flex: 3),
-                  GetBuilder<FirebaseController>(builder: (firebaseController) {
-                    return TextField(
-                      controller: firebaseController.numberController,
-                      keyboardType: TextInputType.number,
-                      maxLength: 10,
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                      decoration: CustomDecoration.inputDecoration(
-                        prefixText: "+91",
-                        label: 'Phone Number',
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 20),
-                  // const Spacer(),
-                  GetBuilder<FirebaseController>(builder: (firebaseController) {
-                    return SizedBox(
-                      width: size.width * .6,
-                      child: CustomButton(
-                        type: ButtonType.primary,
-                        onTap: () {
-                          login(firebaseController, context);
-                        },
-                        title: "Send Otp",
-                      ),
-                    );
-                  }),
-                  const Spacer(),
-                ],
+    return Scaffold(
+      body: Builder(builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30.0),
+          child: Column(
+            children: [
+              const Spacer(),
+              const LoginImage(),
+              // const Spacer(),
+              const SizedBox(height: 20),
+              Center(
+                child: Text(
+                  "Chat App Login",
+                  style: Theme.of(context).textTheme.headline4!.copyWith(color: CustomTheme.textSecondary, fontSize: 20.sp),
+                ),
               ),
-            );
-          }),
+              const SizedBox(height: 20),
+              const Spacer(flex: 3),
+              GetBuilder<FirebaseController>(builder: (firebaseController) {
+                return TextField(
+                  controller: firebaseController.numberController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 10,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: CustomDecoration.inputDecoration(
+                    prefixText: "+91",
+                    label: 'Phone Number',
+                  ),
+                );
+              }),
+              const SizedBox(height: 20),
+              // const Spacer(),
+              GetBuilder<FirebaseController>(builder: (firebaseController) {
+                return SizedBox(
+                  width: size.width * .6,
+                  child: CustomButton(
+                    type: ButtonType.primary,
+                    onTap: () {
+                      login(firebaseController, context);
+                    },
+                    title: "Send Otp",
+                  ),
+                );
+              }),
+              const Spacer(),
+            ],
+          ),
         );
-      },
+      }),
     );
   }
 }

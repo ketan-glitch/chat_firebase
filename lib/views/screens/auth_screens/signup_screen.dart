@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:chat_firebase/controllers/firebase_controller.dart';
+import 'package:chat_firebase/services/enums/dialog_transition.dart';
 import 'package:chat_firebase/services/extensions.dart';
+import 'package:chat_firebase/services/get_animated_dialog.dart';
 import 'package:chat_firebase/services/input_decoration.dart';
 import 'package:chat_firebase/services/route_helper.dart';
 import 'package:chat_firebase/views/base/common_button.dart';
@@ -15,6 +17,8 @@ import 'package:get/instance_manager.dart';
 import 'package:get/state_manager.dart';
 
 import '../../../services/constants.dart';
+import '../../base/dialogs/logout_dialog.dart';
+import '../../base/image_gallery.dart';
 import '../../base/image_picker_sheet.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -43,8 +47,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           IconButton(
               onPressed: () {
-                Get.find<FirebaseController>().firebaseAuth.signOut();
-                Navigator.pushAndRemoveUntil(context, getCustomRoute(child: const SplashScreen()), (route) => false);
+                ShowDialog().getAnimatedDialog(context: context, child: const LogoutDialog(), transitionType: DialogTransition.center).then((value) {
+                  if (value ?? false) {
+                    Get.find<FirebaseController>().firebaseAuth.signOut();
+                    Navigator.pushAndRemoveUntil(context, getCustomRoute(child: const SplashScreen()), (route) => false);
+                  }
+                });
               },
               icon: const Icon(Icons.logout)),
         ],
@@ -60,17 +68,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 const SizedBox(height: 25),
                 Stack(
                   children: [
-                    CircleAvatar(
-                      radius: size.width * .2,
-                      backgroundColor: Colors.white,
-                      child: Builder(builder: (context) {
-                        if (firebaseController.userData.profilePhoto.isValid) {
-                          return CustomImage(path: firebaseController.userData.profilePhoto!);
-                        }
-                        return const CustomAssetImage(
-                          path: Assets.imagesUserPlaceholder,
+                    GestureDetector(
+                      onTap: () {
+                        ShowDialog().getAnimatedDialog(
+                          context: context,
+                          child: Dialog(
+                            child: GestureDetector(
+                              onTap: () {
+                                if (firebaseController.userData.profilePhoto.isValid) {
+                                  Navigator.push(context, getCustomRoute(child: ImageGallery(images: [firebaseController.userData.profilePhoto!])));
+                                }
+                              },
+                              child: CustomImage(
+                                height: size.width * .8,
+                                width: size.width * .8,
+                                path: firebaseController.userData.profilePhoto!,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          transitionType: DialogTransition.center,
                         );
-                      }),
+                      },
+                      child: CircleAvatar(
+                        radius: size.width * .2,
+                        backgroundColor: Colors.white,
+                        child: Builder(builder: (context) {
+                          if (firebaseController.userData.profilePhoto.isValid) {
+                            return CustomImage(path: firebaseController.userData.profilePhoto!);
+                          }
+                          return const CustomAssetImage(
+                            path: Assets.imagesUserPlaceholder,
+                          );
+                        }),
+                      ),
                     ),
                     Positioned(
                       bottom: 0,
