@@ -197,6 +197,37 @@ class FirebaseController extends GetxController implements GetxService {
     }
   }
 
+  Future<void> updateGroupUserName({required String name, required String groupId}) async {
+    try {
+      final CollectionReference collectionReference = FirebaseFirestore.instance.collection(FireStoreConstants.pathMessageCollection);
+      collectionReference.doc(groupId).update({
+        "group_name": name,
+        "group_image": name,
+        "updated_at": getDateTime().millisecondsSinceEpoch,
+      }).whenComplete(() async {
+        log("Completed", name: "updateGroupUserName");
+      }).catchError((e) => log(e.toString(), name: 'updateGroupUserName ERROR'));
+      // await fireStore.collection(FireStoreConstants.pathMessageCollection).doc(groupId).update(data);
+      // await getUserData();
+    } catch (error) {
+      log("$error", name: "ERROR AT updateGroupUserName");
+    }
+  }
+
+  Future<void> updateGroupProfilePicture({String? image}) async {
+    try {
+      final CollectionReference collectionReference = FirebaseFirestore.instance.collection(FireStoreConstants.pathMessageCollection);
+      collectionReference.doc(Get.find<ChatController>().groupChatId).update({
+        "group_image": image,
+        "updated_at": getDateTime().millisecondsSinceEpoch,
+      }).whenComplete(() async {
+        log("Completed", name: "updateGroupProfilePicture");
+      }).catchError((e) => log(e.toString(), name: 'updateGroupProfilePicture ERROR'));
+    } catch (error) {
+      log("$error");
+    }
+  }
+
   Future<void> updateUserProfilePicture({String? image}) async {
     try {
       var fireStore = FirebaseFirestore.instance;
@@ -285,6 +316,8 @@ class FirebaseController extends GetxController implements GetxService {
               Get.find<ChatController>().onSendMessage(content: image, type: TypeMessage.file, peer: peer!);
             } else if (type == ImageUploadType.status) {
               uploadStatusUpdate(image);
+            } else if (type == ImageUploadType.groupImage) {
+              await updateGroupProfilePicture(image: image);
             }
             /*if (peerId.isNotValid) {
             await updateUserProfilePicture(image: image);

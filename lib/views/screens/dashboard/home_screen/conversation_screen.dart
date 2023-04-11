@@ -8,6 +8,7 @@ import 'package:chat_firebase/services/enums/dialog_transition.dart';
 import 'package:chat_firebase/services/extensions.dart';
 import 'package:chat_firebase/services/get_animated_dialog.dart';
 import 'package:chat_firebase/views/screens/auth_screens/login_screen.dart';
+import 'package:chat_firebase/views/screens/dashboard/home_screen/update_group_details_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -28,10 +29,11 @@ import '../../../base/custom_bubble/bubble_special_one.dart';
 import '../../../base/custom_image.dart';
 
 class ChatDetailPage extends StatefulWidget {
-  const ChatDetailPage({super.key, required this.peers, this.groupName});
+  const ChatDetailPage({super.key, required this.peers, this.groupName, this.groupImage});
   // final UserModel peer;
   final List<UserModel> peers;
   final String? groupName;
+  final String? groupImage;
   @override
   State<ChatDetailPage> createState() => _ChatDetailPageState();
 }
@@ -98,6 +100,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
     String? chatImage;
     if (widget.peers.length > 1) {
       chatName = widget.groupName ?? '';
+      chatImage = widget.groupImage ?? '';
     } else {
       chatName = widget.peers.first.name.getIfValid;
       chatImage = widget.peers.first.profilePhoto.getIfValid;
@@ -120,7 +123,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Builder(builder: (context) {
-              if (widget.peers.length > 1) {
+              /*if (widget.peers.length > 1) {
                 return Container(
                   height: 50,
                   width: 50,
@@ -152,7 +155,8 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 // return GroupProfilePictureWidget(
                 //   images: widget.peers.map((e) => e.profilePhoto.toString()).toList(),
                 // );
-              } else if (chatImage.isValid) {
+              } else */
+              if (chatImage.isValid) {
                 return ClipRRect(
                   borderRadius: BorderRadius.circular(45),
                   child: CustomImage(
@@ -178,7 +182,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    chatName,
+                    chatName.capitalizeFirstOfEach,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -201,13 +205,35 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
           ],
         ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(
-              Icons.more_vert,
-              color: Colors.white,
+          if (widget.peers.length > 1)
+            Theme(
+              data: Theme.of(context).copyWith(useMaterial3: false),
+              child: PopupMenuButton(
+                icon: const Icon(
+                  Icons.more_vert,
+                  color: Colors.white,
+                ),
+                // elevation: 20,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                itemBuilder: (context) {
+                  return [
+                    const PopupMenuItem(
+                      value: 'update',
+                      child: Text('Update Group Details'),
+                    ),
+                  ];
+                },
+                onSelected: (value) {
+                  if (value == 'update') {
+                    ShowDialog()
+                        .getAnimatedDialog(context: context, child: const UpdateGroupDetailsDialog(), transitionType: DialogTransition.center)
+                        .then((value) {});
+                  }
+                },
+              ),
             ),
-          ),
         ],
       ),
       body: Stack(
@@ -229,7 +255,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> {
                     return StreamBuilder<QuerySnapshot>(
                         stream: chatController.getChatStream(chatController.groupChatId, chatController.limit),
                         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                          log("${snapshot.data?.docs.length}", name: "LENGTH");
+                          log("${snapshot.data?.docs}", name: "LENGTH");
                           if (snapshot.hasData) {
                             chatController.listMessage = snapshot.data!.docs;
                             if (chatController.listMessage.isNotEmpty) {

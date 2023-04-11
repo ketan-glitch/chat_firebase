@@ -88,7 +88,8 @@ enum ImageUploadType {
   profile('profile'),
   message('message'),
   messageFile('message_file'),
-  status('status');
+  status('status'),
+  groupImage('group_image');
 
   const ImageUploadType(this.value);
   final String value;

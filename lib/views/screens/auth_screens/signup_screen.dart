@@ -13,6 +13,7 @@ import 'package:chat_firebase/views/base/custom_image.dart';
 import 'package:chat_firebase/views/screens/dashboard/dashboard_screen.dart';
 import 'package:chat_firebase/views/screens/splash_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/instance_manager.dart';
 import 'package:get/state_manager.dart';
 
@@ -333,7 +334,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class UpdateNameSheet extends StatefulWidget {
-  const UpdateNameSheet({Key? key}) : super(key: key);
+  const UpdateNameSheet({Key? key, this.name}) : super(key: key);
+  final String? name;
 
   @override
   State<UpdateNameSheet> createState() => _UpdateNameSheetState();
@@ -341,6 +343,12 @@ class UpdateNameSheet extends StatefulWidget {
 
 class _UpdateNameSheetState extends State<UpdateNameSheet> {
   final TextEditingController name = TextEditingController();
+  @override
+  void initState() {
+    super.initState();
+    name.text = widget.name ?? '';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -380,7 +388,11 @@ class _UpdateNameSheetState extends State<UpdateNameSheet> {
                 child: CustomButton(
                   type: ButtonType.primary,
                   onTap: () {
-                    Navigator.pop(context, name.text);
+                    if (name.text.isValid) {
+                      Navigator.pop(context, name.text);
+                    } else {
+                      Fluttertoast.showToast(msg: 'Please enter a valid name');
+                    }
                   },
                   title: "Save",
                 ),

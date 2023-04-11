@@ -81,6 +81,7 @@ class _GroupChatsTabState extends State<GroupChatsTab> {
                       groupData.addAll({
                         'chat_type': 'group',
                         'group_name': data['group_name'],
+                        'group_image': data['group_image'],
                         'group_id': data['group_id'],
                       });
                     } else {
@@ -116,7 +117,7 @@ class SingleChatWidget extends StatelessWidget {
     if (groupData['chat_type'] == 'group') {
       chatMessage = groupData['group_name'] ?? "Available";
       chatTitle = groupData['group_name'] ?? "Unknown Group";
-      // imageUrl = 'peer.profilePhoto';
+      imageUrl = groupData['group_image'];
     } else {
       chatMessage = peers.first.status ?? "Available";
       chatTitle = peers.first.name ?? "Unknown User";
@@ -131,7 +132,16 @@ class SingleChatWidget extends StatelessWidget {
         if (groupData['chat_type'] == 'group') {
           Get.find<ChatController>().groupChatId = groupData['group_id'];
         }
-        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatDetailPage(peers: peers, groupName: groupData['group_name'])));
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatDetailPage(
+              peers: peers,
+              groupName: groupData['group_name'],
+              groupImage: groupData['group_image'],
+            ),
+          ),
+        );
       },
       child: Container(
         color: Colors.transparent,
@@ -139,27 +149,26 @@ class SingleChatWidget extends StatelessWidget {
           children: [
             GestureDetector(
               onTap: () {
-                if (groupData['chat_type'] != 'group') {
-                  ShowDialog().getAnimatedDialog(
-                    context: context,
-                    child: Dialog(
-                      child: GestureDetector(
-                        onTap: () {
-                          if (imageUrl.isValid) {
-                            Navigator.push(context, getCustomRoute(child: ImageGallery(images: [imageUrl!])));
-                          }
-                        },
-                        child: CustomImage(
-                          height: size.width * .8,
-                          width: size.width * .8,
-                          path: imageUrl!,
-                          fit: BoxFit.cover,
-                        ),
+                ShowDialog().getAnimatedDialog(
+                  context: context,
+                  child: Dialog(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (imageUrl.isValid) {
+                          Navigator.push(context, getCustomRoute(child: ImageGallery(images: [imageUrl!])));
+                        }
+                      },
+                      child: CustomImage(
+                        height: size.width * .8,
+                        width: size.width * .8,
+                        path: imageUrl!,
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    transitionType: DialogTransition.center,
-                  );
-                }
+                  ),
+                  transitionType: DialogTransition.center,
+                );
+
                 // showDialog(
                 //   context: context,
                 //   builder: (context) {
@@ -177,7 +186,7 @@ class SingleChatWidget extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(45)),
                 child: Builder(builder: (context) {
-                  if (groupData['chat_type'] == 'group') {
+                  /*if (groupData['chat_type'] == 'group') {
                     return Container(
                       height: 50,
                       width: 50,
@@ -203,7 +212,7 @@ class SingleChatWidget extends StatelessWidget {
                     //   return GroupProfilePictureWidget(
                     //     images: images,
                     //   );
-                  }
+                  }*/
                   if (imageUrl.isValid) {
                     return CustomImage(
                       path: imageUrl!,
@@ -224,7 +233,7 @@ class SingleChatWidget extends StatelessWidget {
             Expanded(
               child: ListTile(
                 title: Text(
-                  chatTitle.getIfValid,
+                  chatTitle.getIfValid.capitalizeFirstOfEach,
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
                 subtitle: Row(children: [
